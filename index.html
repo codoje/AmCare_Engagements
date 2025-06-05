@@ -77,6 +77,21 @@
   button[type="submit"]:hover {
     background: #0066d1;
   }
+  .view-responses {
+    display: block;
+    text-align: center;
+    margin: 1rem auto;
+    text-decoration: none;
+    background: #004aad;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    width: 200px;
+    font-size: 1rem;
+  }
+  .view-responses:hover {
+    background: #0066d1;
+  }
   @media (max-width: 600px) {
     .radio-group {
       flex-direction: column;
@@ -152,32 +167,19 @@
       questions: []
     };
 
-    // Collect radio answers
     const questionCount = document.querySelectorAll(".radio-group").length;
     for (let i = 0; i < questionCount; i++) {
       const answer = formData.get(`question${i}`);
       data.questions.push(answer);
     }
 
-    console.log("Sending to Google Sheets:", data);
+    // Save to localStorage
+    const previousAnswers = JSON.parse(localStorage.getItem('amcareAnswers') || '[]');
+    previousAnswers.push(data);
+    localStorage.setItem('amcareAnswers', JSON.stringify(previousAnswers));
 
-    fetch("https://script.google.com/macros/s/AKfycbyf-hVvonGHs8tuVKm1p0_GgaoKRjZrM38hhpkorF8nnTfLd14zgPj9-MYD9KV9Hnvt/exec", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-    .then(response => response.json())
-    .then(result => {
-      console.log("Success:", result);
-      alert("Answers submitted and saved to Google Sheets!");
-      event.target.reset();
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      alert("There was an error saving your responses. Please try again.");
-    });
+    alert("Answers submitted and saved locally!");
+    event.target.reset();
   }
 </script>
 </head>
@@ -195,5 +197,7 @@
     <div id="form-container"></div>
     <button type="submit">Submit</button>
   </form>
+
+  <a href="results.html" class="view-responses">View Responses</a>
 </body>
 </html>
